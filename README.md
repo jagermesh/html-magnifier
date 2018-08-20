@@ -1,6 +1,10 @@
-JavaScript content magnifier.
+# JavaScript content magnifier.
 
-Usage:
+## Demo
+
+https://jagermesh.com/demo/magnifier/
+
+## Usage:
 
 1) Include the script:
 
