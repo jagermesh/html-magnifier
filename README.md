@@ -1,5 +1,7 @@
 # JavaScript content magnifier.
 
+Simple, lightweight pure JavaScript compomnent that adds a magnifying glass functionality to any web page content.
+
 ## Demo
 
 https://jagermesh.github.io/magnifier/
