@@ -2,7 +2,7 @@
 
 ## Demo
 
-https://jagermesh.com/demo/magnifier/
+https://jagermesh.github.io/magnifier/
 
 ## Usage:
 
