@@ -6,7 +6,6 @@
   "undef": true,
   "globals": {
     "MutationObserver": true,
-    "$": true,
     "window": true,
     "document": true
   },

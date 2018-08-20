@@ -10,38 +10,36 @@ function Magnifier(options) {
   var shape = options.shape || 'square';
   var size  = options.size || 200;
 
-  var magnifierTemplate = '<div class="magnifier" style="display: none;position: fixed;overflow: hidden;background-color: white;border: 1px solid #555;border-radius: 4px;z-index:10000;">' +
+  var magnifierTemplate = '<div draggable="true" class="magnifier" style="display: none;position: fixed;overflow: hidden;background-color: white;border: 1px solid #555;border-radius: 4px;z-index:10000;">' +
                           '  <div class="magnifier-content" style="top: 0px;left: 0px;margin-left: 0px;margin-top: 0px;overflow: visible;position: absolute;display: block;transform-origin: left top;-moz-transform-origin: left top;-ms-transform-origin: left top;-webkit-transform-origin: left top;-o-transform-origin: left top;user-select: none;-moz-user-select: none;-webkit-user-select: none;padding-top: 0px"></div>' +
                           '  <div class="magnifier-glass" style="position: absolute;top: 0px;left: 0px;width: 100%;height: 100%;opacity: 0.0;-ms-filter: alpha(opacity=0);background-color: white;cursor: move;"></div>' +
                           '</div>';
 
-  var magnifier, magnifierContent, magnifierDom;
+  var magnifier, magnifierContent;
   var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
   var observerObj;
   var syncTimeout;
   var events = {};
   var isVisible = false;
+  var magnifierBody;
 
   function setupMagnifier() {
     switch(shape) {
       case 'square':
-        magnifier.css({ 'width': size + 'px'
-                      , 'height': size + 'px'
-                      });
+        magnifier.style.width = size + 'px';
+        magnifier.style.height = size + 'px';
         break;
       case 'circle':
-        magnifier.css({ 'width': size + 'px'
-                      , 'height': size + 'px'
-                      , 'border-radius': '50%'
-                      });
+        magnifier.style.width = size + 'px';
+        magnifier.style.height = size + 'px';
+        magnifier.style.borderRadius = '50%';
         break;
     }
-    magnifierContent.css({ 'transform': 'scale(' + zoom + ')'
-                         , '-moz-transform': 'scale(' + zoom + ')'
-                         , '-webkit-transform': 'scale(' + zoom + ')'
-                         , '-ms-transform': 'scale(' + zoom + ')'
-                         , '-o-transform': 'scale(' + zoom + ')'
-                         });
+    magnifierContent.style.WebkitTransform =
+      magnifierContent.style.MozTransform =
+        magnifierContent.style.OTransform =
+          magnifierContent.style.MsTransform =
+            magnifierContent.style.transform = 'scale(' + zoom + ')';
   }
 
   function isDescendant(parent, child) {
@@ -87,7 +85,7 @@ function Magnifier(options) {
     if (MutationObserver) {
       observerObj = new MutationObserver(function(mutations, observer) {
         for(var i = 0; i < mutations.length; i++) {
-          if (!isDescendant(magnifierDom, mutations[i].target)) {
+          if (!isDescendant(magnifier, mutations[i].target)) {
             domChanged();
             break;
           }
@@ -111,38 +109,49 @@ function Magnifier(options) {
   }
 
   function syncViewport() {
-    var x1 = magnifier.position().left;
-    var y1 = magnifier.position().top;
-    magnifierContent.css('left', -x1*zoom);
-    magnifierContent.css('top', -y1*zoom);
-    triggerEvent('viewPortChanged', magnifierContent.find('body'));
+    var x1 = magnifier.offsetLeft;
+    var y1 = magnifier.offsetTop;
+    var x2 = document.body.scrollLeft;
+    var y2 = document.body.scrollTop;
+    magnifierContent.style.left = -x1*zoom - x2*zoom;
+    magnifierContent.style.top = -y1*zoom - y2*zoom;
+    triggerEvent('viewPortChanged', magnifierBody);
+  }
+
+  function removeSelectors(container, selector) {
+    var elements = container.querySelectorAll(selector);
+    if (elements.length > 0) {
+      for(var i = 0; i < elements.length; i++) {
+        elements[i].parentNode.removeChild(elements[i]);
+      }
+    }
   }
 
   function prepareContent() {
-    magnifierContent.html('');
-    var b = $('body').clone();
-    var color = $('body').css('background-color');
+    magnifierContent.innerHTML = '';
+    var bodyCopy = document.body.cloneNode(true);
+    var color = document.body.style.backgroundColor;
     if (color) {
       magnifier.css('background-color', color);
     }
-    b.css('cursor', 'auto');
-    b.css('padding-top', '0px');
-    b.attr('unselectable', 'on');
-    $('script', b).remove();
-    $('.magnifier', b).remove();
-    triggerEvent('prepareContent', b);
-    magnifierContent.append(b);
-    magnifierContent.css('width', $(document).width());
-    magnifierContent.css('height', $(document).height());
-    triggerEvent('contentUpdated', magnifierContent.find('body'));
+    bodyCopy.style.cursor = 'auto';
+    bodyCopy.style.paddingTop = '0px';
+    bodyCopy.setAttribute('unselectable', 'on');
+    removeSelectors(bodyCopy, 'script');
+    removeSelectors(bodyCopy, '.magnifier');
+    triggerEvent('prepareContent', bodyCopy);
+    magnifierContent.appendChild(bodyCopy);
+    magnifierContent.style.width  = document.body.clientWidth;
+    magnifierContent.style.height = document.body.clientHeight;
+    magnifierBody = magnifierContent.querySelector('body');
+    triggerEvent('contentUpdated', magnifierBody);
   }
 
   function initScrollBars() {
-    var mb = magnifierContent.find('body');
-    triggerEvent('initScrollBars', mb);
+    triggerEvent('initScrollBars', magnifierBody);
   }
 
-  function syncScrollTop(ctrl, mb) {
+  function syncScroll(ctrl) {
     var selectors = [];
     if (ctrl.getAttribute) {
       if (ctrl.getAttribute('id')) {
@@ -152,48 +161,92 @@ function Magnifier(options) {
         selectors.push('.' + ctrl.className.split(' ').join('.'));
       }
       for(var i = 0; i < selectors.length; i++) {
-        var t = $(selectors[i], mb);
+        var t = magnifierBody.querySelectorAll(selectors[i]);
         if (t.length == 1) {
-          t[0].scrollTop = ctrl.scrollTop;
+          t[0].scrollTop  = ctrl.scrollTop;
+          t[0].scrollLeft = ctrl.scrollLeft;
           return true;
         }
       }
+    } else
+    if (ctrl == document) {
+      syncViewport();
     }
     return false;
   }
 
   function syncScrollBars(e) {
     if (isVisible) {
-      var mb = magnifierContent.find('body');
       if (e && e.target) {
-        syncScrollTop(e.target, mb);
+        syncScroll(e.target);
       } else {
-        var scrolled = [];
-        $('div').each(function() {
-          if (this.scrollTop > 0) {
+        var scrolled = [], i;
+        var elements = document.body.querySelectorAll('div');
+        for(i = 0; i < elements.length; i++) {
+          if (elements[i].scrollTop > 0) {
             scrolled.push(this);
           }
-        });
-        for(var i = 0; i < scrolled.length; i++) {
-          if (!isDescendant(magnifierDom, scrolled[i])) {
-            syncScrollTop(scrolled[i], mb);
+        }
+        for(i = 0; i < scrolled.length; i++) {
+          if (!isDescendant(magnifier, scrolled[i])) {
+            syncScroll(scrolled[i]);
           }
         }
       }
-      triggerEvent('syncScrollBars', mb);
+      triggerEvent('syncScrollBars', magnifierBody);
     }
   }
 
+  function setupDrag(ctrl, ondrag) {
+
+    var dragObject = null;
+
+    var drg_h, drg_w, pos_y, pos_x;
+
+    ctrl.style.cursor = 'move';
+
+    ctrl.addEventListener('mousedown', function(e) {
+      var target = e.target || e.srcElement;
+      dragObject = this;
+
+      drg_h = dragObject.offsetHeight;
+      drg_w = dragObject.offsetWidth;
+      pos_y = dragObject.getBoundingClientRect().top  + document.body.scrollTop + drg_h - e.pageY;
+      pos_x = dragObject.getBoundingClientRect().left + document.body.scrollLeft + drg_w - e.pageX;
+
+      e.preventDefault();
+    });
+
+    window.addEventListener('mousemove', function(e) {
+      if (dragObject !== null) {
+        dragObject.style.top  = e.pageY + pos_y - drg_h - document.body.scrollTop;
+        dragObject.style.left = e.pageX + pos_x - drg_w - document.body.scrollLeft;
+        ondrag();
+      }
+    });
+
+    window.addEventListener('mouseup', function() {
+      if (dragObject !== null) {
+        dragObject = null;
+      }
+    });
+
+    return this;
+
+  }
+
   function init() {
-    magnifier = $(magnifierTemplate);
-    $('body').append(magnifier);
-    magnifierContent = magnifier.find('.magnifier-content');
-    magnifierDom = magnifier[0];
+    var div = document.createElement('div');
+    div.innerHTML = magnifierTemplate;
+    magnifier = div.querySelector('.magnifier');
+    // magnifier = $(magnifierTemplate);
+    document.body.appendChild(magnifier);
+    magnifierContent = magnifier.querySelector('.magnifier-content');
     if (window.addEventListener) {
       window.addEventListener('resize', syncContent, false);
       window.addEventListener('scroll', syncScrollBars, true);
     }
-    magnifier.draggable({ drag: syncViewport});
+    setupDrag(magnifier, syncViewport);
   }
 
   _this.setZoom = function(zoom) {
@@ -247,8 +300,8 @@ function Magnifier(options) {
 
   _this.hide = function(event) {
     unBindDOMObserver();
-    magnifierContent.html('');
-    magnifier.hide();
+    magnifierContent.innerHTML = '';
+    magnifier.style.display = 'none';
     isVisible = false;
   };
 
@@ -264,10 +317,9 @@ function Magnifier(options) {
     setupMagnifier();
     prepareContent();
     bindDOMObserver();
-    magnifier.css({ 'left': left
-                  , 'top': top
-                  });
-    magnifier.show();
+    magnifier.style.left = left;
+    magnifier.style.top = top;
+    magnifier.style.display = '';
     syncViewport();
     syncScrollBars();
     initScrollBars();
