@@ -1,0 +1,14 @@
+{
+  "laxcomma": true,
+  "loopfunc": true,
+  "laxbreak": true,
+  "sub": true,
+  "undef": true,
+  "globals": {
+    "MutationObserver": true,
+    "$": true,
+    "window": true,
+    "document": true
+  },
+  "esversion": 6
+}
