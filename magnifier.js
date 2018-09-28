@@ -23,15 +23,23 @@ function Magnifier(options) {
   var isVisible = false;
   var magnifierBody;
 
+  function setPosition(element, left, top) {
+    element.style.left = left + 'px';
+    element.style.top = top + 'px';
+  }
+
+  function setDimensions(element, width, height) {
+    element.style.width = width + 'px';
+    element.style.height = height + 'px';
+  }
+
   function setupMagnifier() {
     switch(shape) {
       case 'square':
-        magnifier.style.width = size + 'px';
-        magnifier.style.height = size + 'px';
+        setDimensions(magnifier, size, size);
         break;
       case 'circle':
-        magnifier.style.width = size + 'px';
-        magnifier.style.height = size + 'px';
+        setDimensions(magnifier, size, size);
         magnifier.style.borderRadius = '50%';
         break;
     }
@@ -113,8 +121,9 @@ function Magnifier(options) {
     var y1 = magnifier.offsetTop;
     var x2 = document.body.scrollLeft;
     var y2 = document.body.scrollTop;
-    magnifierContent.style.left = -x1*zoom - x2*zoom;
-    magnifierContent.style.top = -y1*zoom - y2*zoom;
+    var left = -x1*zoom - x2*zoom;
+    var top = -y1*zoom - y2*zoom;
+    setPosition(magnifierContent, left, top);
     triggerEvent('viewPortChanged', magnifierBody);
   }
 
@@ -141,8 +150,9 @@ function Magnifier(options) {
     removeSelectors(bodyCopy, '.magnifier');
     triggerEvent('prepareContent', bodyCopy);
     magnifierContent.appendChild(bodyCopy);
-    magnifierContent.style.width  = document.body.clientWidth;
-    magnifierContent.style.height = document.body.clientHeight;
+    var width = document.body.clientWidth;
+    var height = document.body.clientHeight;
+    setDimensions(magnifierContent, width, height);
     magnifierBody = magnifierContent.querySelector('body');
     triggerEvent('contentUpdated', magnifierBody);
   }
@@ -219,8 +229,9 @@ function Magnifier(options) {
 
     window.addEventListener('mousemove', function(e) {
       if (dragObject !== null) {
-        dragObject.style.top  = e.pageY + pos_y - drg_h - document.body.scrollTop;
-        dragObject.style.left = e.pageX + pos_x - drg_w - document.body.scrollLeft;
+        var left = e.pageX + pos_x - drg_w - document.body.scrollLeft;
+        var top = e.pageY + pos_y - drg_h - document.body.scrollTop;
+        setPosition(dragObject, left, top);
         ondrag();
       }
     });
@@ -314,11 +325,12 @@ function Magnifier(options) {
       left = 200;
       top = 200;
     }
+    // br.log(left);
+    // br.log(top);
     setupMagnifier();
     prepareContent();
     bindDOMObserver();
-    magnifier.style.left = left;
-    magnifier.style.top = top;
+    setPosition(magnifier, left, top);
     magnifier.style.display = '';
     syncViewport();
     syncScrollBars();
