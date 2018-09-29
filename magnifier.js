@@ -191,10 +191,10 @@ function Magnifier(options) {
         syncScroll(e.target);
       } else {
         var scrolled = [], i;
-        var elements = document.body.querySelectorAll('div');
+        var elements = document.querySelectorAll('div');
         for(i = 0; i < elements.length; i++) {
           if (elements[i].scrollTop > 0) {
-            scrolled.push(this);
+            scrolled.push(elements[i]);
           }
         }
         for(i = 0; i < scrolled.length; i++) {
@@ -250,7 +250,6 @@ function Magnifier(options) {
     var div = document.createElement('div');
     div.innerHTML = magnifierTemplate;
     magnifier = div.querySelector('.magnifier');
-    // magnifier = $(magnifierTemplate);
     document.body.appendChild(magnifier);
     magnifierContent = magnifier.querySelector('.magnifier-content');
     if (window.addEventListener) {
@@ -325,8 +324,6 @@ function Magnifier(options) {
       left = 200;
       top = 200;
     }
-    // br.log(left);
-    // br.log(top);
     setupMagnifier();
     prepareContent();
     bindDOMObserver();
