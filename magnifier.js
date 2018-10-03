@@ -62,14 +62,18 @@ function Magnifier(options) {
   }
 
   function syncContent() {
-    prepareContent();
-    syncViewport();
-    syncScrollBars();
+    if (isVisible) {
+      prepareContent();
+      syncViewport();
+      syncScrollBars();
+    }
   }
 
   function syncContentQueued() {
-    window.clearTimeout(syncTimeout);
-    syncTimeout = window.setTimeout(syncContent, 100);
+    if (isVisible) {
+      window.clearTimeout(syncTimeout);
+      syncTimeout = window.setTimeout(syncContent, 100);
+    }
   }
 
   function domChanged() {
@@ -111,7 +115,7 @@ function Magnifier(options) {
     var handlers = events[event];
     if (handlers) {
       for(var i = 0; i < handlers.length; i++) {
-        handlers[i].apply(_this, data);
+        handlers[i].call(_this, data);
       }
     }
   }
@@ -303,9 +307,7 @@ function Magnifier(options) {
   };
 
   _this.syncContent = function(event) {
-    if (isVisible) {
-      syncContentQueued();
-    }
+    syncContentQueued();
   };
 
   _this.hide = function(event) {
