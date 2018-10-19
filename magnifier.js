@@ -10,7 +10,7 @@ function Magnifier(options) {
   var shape = options.shape || 'square';
   var size  = options.size || 200;
 
-  var magnifierTemplate = '<div draggable="true" class="magnifier" style="display: none;position: fixed;overflow: hidden;background-color: white;border: 1px solid #555;border-radius: 4px;z-index:10000;">' +
+  var magnifierTemplate = '<div class="magnifier" style="display: none;position: fixed;overflow: hidden;background-color: white;border: 1px solid #555;border-radius: 4px;z-index:10000;">' +
                           '  <div class="magnifier-content" style="top: 0px;left: 0px;margin-left: 0px;margin-top: 0px;overflow: visible;position: absolute;display: block;transform-origin: left top;-moz-transform-origin: left top;-ms-transform-origin: left top;-webkit-transform-origin: left top;-o-transform-origin: left top;user-select: none;-moz-user-select: none;-webkit-user-select: none;padding-top: 0px"></div>' +
                           '  <div class="magnifier-glass" style="position: absolute;top: 0px;left: 0px;width: 100%;height: 100%;opacity: 0.0;-ms-filter: alpha(opacity=0);background-color: white;cursor: move;"></div>' +
                           '</div>';
@@ -142,14 +142,25 @@ function Magnifier(options) {
 
   function prepareContent() {
     magnifierContent.innerHTML = '';
-    var bodyCopy = document.body.cloneNode(true);
-    var color = document.body.style.backgroundColor;
+    var bodyOriginal = document.body;
+    var bodyCopy = bodyOriginal.cloneNode(true);
+    var color = bodyOriginal.style.backgroundColor;
     if (color) {
       magnifier.css('background-color', color);
     }
     bodyCopy.style.cursor = 'auto';
     bodyCopy.style.paddingTop = '0px';
     bodyCopy.setAttribute('unselectable', 'on');
+    var canvasOriginal = bodyOriginal.querySelectorAll('canvas');
+    var canvasCopy = bodyCopy.querySelectorAll('canvas');
+    if (canvasOriginal.length > 0) {
+      if (canvasOriginal.length === canvasCopy.length) {
+        for(var i = 0; i < canvasOriginal.length; i++) {
+          var ctx = canvasCopy[i].getContext('2d');
+          ctx.drawImage(canvasOriginal[i], 0, 0);
+        }
+      }
+    }
     removeSelectors(bodyCopy, 'script');
     removeSelectors(bodyCopy, '.magnifier');
     triggerEvent('prepareContent', bodyCopy);
@@ -211,42 +222,98 @@ function Magnifier(options) {
     }
   }
 
-  function setupDrag(ctrl, ondrag) {
+  function makeDraggable(ctrl, options) {
+
+    var _this = this;
 
     var dragObject = null;
+    var dragHandler = null;
 
-    var drg_h, drg_w, pos_y, pos_x;
+    options = options || {};
+    options.exclude = [ 'INPUT', 'TEXTAREA', 'SELECT', 'A', 'BUTTON' ];
+
+    if (options.handler) {
+      dragHandler = ctrl.querySelector(options.handler);
+    } else {
+      dragHandler = ctrl;
+    }
+
+    function setPosition(element, left, top) {
+      element.style.left = left + 'px';
+      element.style.top = top + 'px';
+    }
+
+    var drg_h, drg_w, pos_y, pos_x, ofs_x, ofs_y;
 
     ctrl.style.cursor = 'move';
 
-    ctrl.addEventListener('mousedown', function(e) {
+    function downHandler(e) {
       var target = e.target || e.srcElement;
-      dragObject = this;
+      var parent = target.parentNode;
 
-      drg_h = dragObject.offsetHeight;
-      drg_w = dragObject.offsetWidth;
-      pos_y = dragObject.getBoundingClientRect().top  + document.body.scrollTop + drg_h - e.pageY;
-      pos_x = dragObject.getBoundingClientRect().left + document.body.scrollLeft + drg_w - e.pageX;
+      if (target && (options.exclude.indexOf(target.tagName.toUpperCase()) == -1)) {
+        if (!parent || (options.exclude.indexOf(parent.tagName.toUpperCase()) == -1)) {  // img in a
+          dragObject = ctrl;
 
-      e.preventDefault();
-    });
+          var pageX = e.pageX || e.touches[0].pageX;
+          var pageY = e.pageY || e.touches[0].pageY;
 
-    window.addEventListener('mousemove', function(e) {
-      if (dragObject !== null) {
-        var left = e.pageX + pos_x - drg_w - document.body.scrollLeft;
-        var top = e.pageY + pos_y - drg_h - document.body.scrollTop;
-        setPosition(dragObject, left, top);
-        ondrag();
+          ofs_x = dragObject.getBoundingClientRect().left - dragObject.offsetLeft;
+          ofs_y = dragObject.getBoundingClientRect().top  - dragObject.offsetTop;
+
+          pos_x = pageX - (dragObject.getBoundingClientRect().left + document.body.scrollLeft);
+          pos_y = pageY - (dragObject.getBoundingClientRect().top  + document.body.scrollTop);
+
+          e.preventDefault();
+        }
       }
-    });
+    }
 
-    window.addEventListener('mouseup', function() {
+    function moveHandler(e) {
+      if (dragObject !== null) {
+        var pageX = e.pageX || e.touches[0].pageX;
+        var pageY = e.pageY || e.touches[0].pageY;
+        var left = pageX - pos_x - ofs_x - document.body.scrollLeft;
+        var top  = pageY - pos_y - ofs_y  - document.body.scrollTop;
+
+        setPosition(dragObject, left, top);
+        if (options.ondrag) {
+          options.ondrag.call(e);
+        }
+      }
+    }
+
+    function upHandler(e) {
       if (dragObject !== null) {
         dragObject = null;
       }
+    }
+
+    dragHandler.addEventListener('mousedown', function(e) {
+      downHandler(e);
     });
 
-    return this;
+    window.addEventListener('mousemove', function(e) {
+      moveHandler(e);
+    });
+
+    window.addEventListener('mouseup', function(e) {
+      upHandler(e);
+    });
+
+    dragHandler.addEventListener('touchstart', function(e) {
+      downHandler(e);
+    });
+
+    window.addEventListener('touchmove', function(e) {
+      moveHandler(e);
+    });
+
+    window.addEventListener('touchend', function(e) {
+      upHandler(e);
+    });
+
+    return _this;
 
   }
 
@@ -260,7 +327,7 @@ function Magnifier(options) {
       window.addEventListener('resize', syncContent, false);
       window.addEventListener('scroll', syncScrollBars, true);
     }
-    setupDrag(magnifier, syncViewport);
+    makeDraggable(magnifier, { ondrag: syncViewport });
   }
 
   _this.setZoom = function(zoom) {
@@ -328,12 +395,12 @@ function Magnifier(options) {
     }
     setupMagnifier();
     prepareContent();
-    bindDOMObserver();
     setPosition(magnifier, left, top);
     magnifier.style.display = '';
     syncViewport();
     syncScrollBars();
     initScrollBars();
+    bindDOMObserver();
     isVisible = true;
   };
 
