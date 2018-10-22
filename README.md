@@ -38,9 +38,9 @@ There are also some settings which you can pass to constructor
 
 ~~~
 {
-zoom: 2
-shape: square | circle
-size: 200
+    zoom: 2
+    shape: square | circle
+    size: 200
 }
 ~~~
 
