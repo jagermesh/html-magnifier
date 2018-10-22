@@ -1,4 +1,4 @@
-# JavaScript content magnifier.
+# JavaScript content magnifier
 
 Simple, lightweight pure JavaScript component that adds a magnifying glass functionality to any web page content.
 
