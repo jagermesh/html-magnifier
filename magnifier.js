@@ -162,6 +162,8 @@ function Magnifier(options) {
       }
     }
     removeSelectors(bodyCopy, 'script');
+    removeSelectors(bodyCopy, 'audio');
+    removeSelectors(bodyCopy, 'video');
     removeSelectors(bodyCopy, '.magnifier');
     triggerEvent('prepareContent', bodyCopy);
     magnifierContent.appendChild(bodyCopy);
