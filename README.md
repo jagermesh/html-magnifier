@@ -4,20 +4,20 @@ Simple, lightweight pure JavaScript component that adds a magnifying glass funct
 
 ## Demo
 
-https://jagermesh.github.io/magnifier/
+https://jagermesh.github.io/html-magnifier/
 
 ## Usage:
 
 1) Include the script:
 
 ~~~
-<script type="text/javascript" src="magnifier.js"></script>
+<script type="text/javascript" src="html-magnifier.js"></script>
 ~~~
 
 2) Create magnifier instance
 
 ~~~
-var magnifier = new Magnifier();
+var magnifier = new HTMLMagnifier();
 ~~~
 
 3) Show when needed

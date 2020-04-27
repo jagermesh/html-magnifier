@@ -1,6 +1,6 @@
 /* global MutationObserver */
 
-function Magnifier(options) {
+function HTMLMagnifier(options) {
 
   var _this = this;
 
