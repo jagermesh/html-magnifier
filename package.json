@@ -1,0 +1,26 @@
+{
+  "author": {
+    "name": "Jager Mesh"
+  },
+  "bugs": {
+    "url": "https://github.com/jagermesh/magnifier/issues"
+  },
+  "deprecated": false,
+  "description": "Content Magnifier",
+  "homepage": "https://github.com/jagermesh/magnifier#readme",
+  "keywords": [
+    "magnifier",
+    "content magnifier"
+  ],
+  "license": "MIT",
+  "main": "magnifier.js",
+  "name": "magnifier",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/jagermesh/magnifier.git"
+  },
+  "scripts": {
+    "test": "echo \"OK\""
+  },
+  "version": "1.0.0"
+}
