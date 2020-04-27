@@ -3,21 +3,22 @@
     "name": "Jager Mesh"
   },
   "bugs": {
-    "url": "https://github.com/jagermesh/magnifier/issues"
+    "url": "https://github.com/jagermesh/html-magnifier/issues"
   },
   "deprecated": false,
   "description": "Content Magnifier",
-  "homepage": "https://github.com/jagermesh/magnifier#readme",
+  "homepage": "https://github.com/jagermesh/html-magnifier#readme",
   "keywords": [
     "magnifier",
-    "content magnifier"
+    "content magnifier",
+    "html magnifier"
   ],
   "license": "MIT",
   "main": "magnifier.js",
-  "name": "magnifier",
+  "name": "html-magnifier",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/jagermesh/magnifier.git"
+    "url": "git+ssh://git@github.com/jagermesh/html-magnifier.git"
   },
   "scripts": {
     "test": "echo \"OK\""
