@@ -2,26 +2,23 @@
 
 function HTMLMagnifier(options) {
 
-  var _this = this;
+  const _this = this;
 
-  options = options || {};
+  _this.options = Object.assign({ zoom: 2, shape: 'square', width: 200, height: 200 }, options);
 
-  var zoom  = options.zoom || 2;
-  var shape = options.shape || 'square';
-  var size  = options.size || 200;
+  const magnifierTemplate = `<div class="magnifier" style="display: none;position: fixed;overflow: hidden;background-color: white;border: 1px solid #555;border-radius: 4px;z-index:10000;">
+                               <div class="magnifier-content" style="top: 0px;left: 0px;margin-left: 0px;margin-top: 0px;overflow: visible;position: absolute;display: block;transform-origin: left top;-moz-transform-origin: left top;-ms-transform-origin: left top;-webkit-transform-origin: left top;-o-transform-origin: left top;user-select: none;-moz-user-select: none;-webkit-user-select: none;padding-top: 0px"></div>
+                               <div class="magnifier-glass" style="position: absolute;top: 0px;left: 0px;width: 100%;height: 100%;opacity: 0.0;-ms-filter: alpha(opacity=0);background-color: white;cursor: move;"></div>
+                             </div>`;
 
-  var magnifierTemplate = '<div class="magnifier" style="display: none;position: fixed;overflow: hidden;background-color: white;border: 1px solid #555;border-radius: 4px;z-index:10000;">' +
-                          '  <div class="magnifier-content" style="top: 0px;left: 0px;margin-left: 0px;margin-top: 0px;overflow: visible;position: absolute;display: block;transform-origin: left top;-moz-transform-origin: left top;-ms-transform-origin: left top;-webkit-transform-origin: left top;-o-transform-origin: left top;user-select: none;-moz-user-select: none;-webkit-user-select: none;padding-top: 0px"></div>' +
-                          '  <div class="magnifier-glass" style="position: absolute;top: 0px;left: 0px;width: 100%;height: 100%;opacity: 0.0;-ms-filter: alpha(opacity=0);background-color: white;cursor: move;"></div>' +
-                          '</div>';
+  const MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
 
-  var magnifier, magnifierContent;
-  var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
-  var observerObj;
-  var syncTimeout;
-  var events = {};
-  var isVisible = false;
-  var magnifierBody;
+  let magnifier, magnifierContent;
+  let observerObj;
+  let syncTimeout;
+  let isVisible = false;
+  let magnifierBody;
+  let events = {};
 
   function setPosition(element, left, top) {
     element.style.left = left + 'px';
@@ -34,12 +31,12 @@ function HTMLMagnifier(options) {
   }
 
   function setupMagnifier() {
-    switch(shape) {
+    switch(_this.options.shape) {
       case 'square':
-        setDimensions(magnifier, size, size);
+        setDimensions(magnifier, _this.options.width, _this.options.height);
         break;
       case 'circle':
-        setDimensions(magnifier, size, size);
+        setDimensions(magnifier, _this.options.width, _this.options.height);
         magnifier.style.borderRadius = '50%';
         break;
     }
@@ -47,11 +44,11 @@ function HTMLMagnifier(options) {
       magnifierContent.style.MozTransform =
         magnifierContent.style.OTransform =
           magnifierContent.style.MsTransform =
-            magnifierContent.style.transform = 'scale(' + zoom + ')';
+            magnifierContent.style.transform = 'scale(' + _this.options.zoom + ')';
   }
 
   function isDescendant(parent, child) {
-    var node = child;
+    let node = child;
     while (node != null) {
       if (node == parent) {
         return true;
@@ -96,7 +93,7 @@ function HTMLMagnifier(options) {
   function bindDOMObserver() {
     if (MutationObserver) {
       observerObj = new MutationObserver(function(mutations, observer) {
-        for(var i = 0; i < mutations.length; i++) {
+        for(let i = 0; i < mutations.length; i++) {
           if (!isDescendant(magnifier, mutations[i].target)) {
             domChanged();
             break;
@@ -112,29 +109,29 @@ function HTMLMagnifier(options) {
   }
 
   function triggerEvent(event, data) {
-    var handlers = events[event];
+    const handlers = events[event];
     if (handlers) {
-      for(var i = 0; i < handlers.length; i++) {
+      for(let i = 0; i < handlers.length; i++) {
         handlers[i].call(_this, data);
       }
     }
   }
 
   function syncViewport() {
-    var x1 = magnifier.offsetLeft;
-    var y1 = magnifier.offsetTop;
-    var x2 = document.body.scrollLeft;
-    var y2 = document.body.scrollTop;
-    var left = -x1*zoom - x2*zoom;
-    var top = -y1*zoom - y2*zoom;
+    const x1 = magnifier.offsetLeft;
+    const y1 = magnifier.offsetTop;
+    const x2 = document.body.scrollLeft;
+    const y2 = document.body.scrollTop;
+    const left = -x1 * _this.options.zoom - x2 * _this.options.zoom;
+    const top = -y1 * _this.options.zoom - y2 * _this.options.zoom;
     setPosition(magnifierContent, left, top);
     triggerEvent('viewPortChanged', magnifierBody);
   }
 
   function removeSelectors(container, selector) {
-    var elements = container.querySelectorAll(selector);
+    const elements = container.querySelectorAll(selector);
     if (elements.length > 0) {
-      for(var i = 0; i < elements.length; i++) {
+      for(let i = 0; i < elements.length; i++) {
         elements[i].parentNode.removeChild(elements[i]);
       }
     }
@@ -142,21 +139,21 @@ function HTMLMagnifier(options) {
 
   function prepareContent() {
     magnifierContent.innerHTML = '';
-    var bodyOriginal = document.body;
-    var bodyCopy = bodyOriginal.cloneNode(true);
-    var color = bodyOriginal.style.backgroundColor;
+    const bodyOriginal = document.body;
+    const bodyCopy = bodyOriginal.cloneNode(true);
+    const color = bodyOriginal.style.backgroundColor;
     if (color) {
       magnifier.css('background-color', color);
     }
     bodyCopy.style.cursor = 'auto';
     bodyCopy.style.paddingTop = '0px';
     bodyCopy.setAttribute('unselectable', 'on');
-    var canvasOriginal = bodyOriginal.querySelectorAll('canvas');
-    var canvasCopy = bodyCopy.querySelectorAll('canvas');
+    const canvasOriginal = bodyOriginal.querySelectorAll('canvas');
+    const canvasCopy = bodyCopy.querySelectorAll('canvas');
     if (canvasOriginal.length > 0) {
       if (canvasOriginal.length === canvasCopy.length) {
-        for(var i = 0; i < canvasOriginal.length; i++) {
-          var ctx = canvasCopy[i].getContext('2d');
+        for(let i = 0; i < canvasOriginal.length; i++) {
+          let ctx = canvasCopy[i].getContext('2d');
           ctx.drawImage(canvasOriginal[i], 0, 0);
         }
       }
@@ -167,8 +164,8 @@ function HTMLMagnifier(options) {
     removeSelectors(bodyCopy, '.magnifier');
     triggerEvent('prepareContent', bodyCopy);
     magnifierContent.appendChild(bodyCopy);
-    var width = document.body.clientWidth;
-    var height = document.body.clientHeight;
+    const width = document.body.clientWidth;
+    const height = document.body.clientHeight;
     setDimensions(magnifierContent, width, height);
     magnifierBody = magnifierContent.querySelector('body');
     triggerEvent('contentUpdated', magnifierBody);
@@ -179,7 +176,7 @@ function HTMLMagnifier(options) {
   }
 
   function syncScroll(ctrl) {
-    var selectors = [];
+    const selectors = [];
     if (ctrl.getAttribute) {
       if (ctrl.getAttribute('id')) {
         selectors.push('#' + ctrl.getAttribute('id'));
@@ -187,8 +184,8 @@ function HTMLMagnifier(options) {
       if (ctrl.className) {
         selectors.push('.' + ctrl.className.split(' ').join('.'));
       }
-      for(var i = 0; i < selectors.length; i++) {
-        var t = magnifierBody.querySelectorAll(selectors[i]);
+      for(let i = 0; i < selectors.length; i++) {
+        let t = magnifierBody.querySelectorAll(selectors[i]);
         if (t.length == 1) {
           t[0].scrollTop  = ctrl.scrollTop;
           t[0].scrollLeft = ctrl.scrollLeft;
@@ -207,14 +204,14 @@ function HTMLMagnifier(options) {
       if (e && e.target) {
         syncScroll(e.target);
       } else {
-        var scrolled = [], i;
-        var elements = document.querySelectorAll('div');
-        for(i = 0; i < elements.length; i++) {
+        let scrolled = [];
+        let elements = document.querySelectorAll('div');
+        for(let i = 0; i < elements.length; i++) {
           if (elements[i].scrollTop > 0) {
             scrolled.push(elements[i]);
           }
         }
-        for(i = 0; i < scrolled.length; i++) {
+        for(let i = 0; i < scrolled.length; i++) {
           if (!isDescendant(magnifier, scrolled[i])) {
             syncScroll(scrolled[i]);
           }
@@ -226,10 +223,10 @@ function HTMLMagnifier(options) {
 
   function makeDraggable(ctrl, options) {
 
-    var _this = this;
+    const _this = this;
 
-    var dragObject = null;
-    var dragHandler = null;
+    let dragObject = null;
+    let dragHandler = null;
 
     options = options || {};
     options.exclude = [ 'INPUT', 'TEXTAREA', 'SELECT', 'A', 'BUTTON' ];
@@ -245,20 +242,20 @@ function HTMLMagnifier(options) {
       element.style.top = top + 'px';
     }
 
-    var drg_h, drg_w, pos_y, pos_x, ofs_x, ofs_y;
+    let drg_h, drg_w, pos_y, pos_x, ofs_x, ofs_y;
 
     ctrl.style.cursor = 'move';
 
     function downHandler(e) {
-      var target = e.target || e.srcElement;
-      var parent = target.parentNode;
+      const target = e.target || e.srcElement;
+      const parent = target.parentNode;
 
       if (target && (options.exclude.indexOf(target.tagName.toUpperCase()) == -1)) {
         if (!parent || (options.exclude.indexOf(parent.tagName.toUpperCase()) == -1)) {  // img in a
           dragObject = ctrl;
 
-          var pageX = e.pageX || e.touches[0].pageX;
-          var pageY = e.pageY || e.touches[0].pageY;
+          const pageX = e.pageX || e.touches[0].pageX;
+          const pageY = e.pageY || e.touches[0].pageY;
 
           ofs_x = dragObject.getBoundingClientRect().left - dragObject.offsetLeft;
           ofs_y = dragObject.getBoundingClientRect().top  - dragObject.offsetTop;
@@ -273,10 +270,10 @@ function HTMLMagnifier(options) {
 
     function moveHandler(e) {
       if (dragObject !== null) {
-        var pageX = e.pageX || e.touches[0].pageX;
-        var pageY = e.pageY || e.touches[0].pageY;
-        var left = pageX - pos_x - ofs_x - document.body.scrollLeft;
-        var top  = pageY - pos_y - ofs_y  - document.body.scrollTop;
+        const pageX = e.pageX || e.touches[0].pageX;
+        const pageY = e.pageY || e.touches[0].pageY;
+        const left = pageX - pos_x - ofs_x - document.body.scrollLeft;
+        const top  = pageY - pos_y - ofs_y  - document.body.scrollTop;
 
         setPosition(dragObject, left, top);
         if (options.ondrag) {
@@ -320,7 +317,7 @@ function HTMLMagnifier(options) {
   }
 
   function init() {
-    var div = document.createElement('div');
+    const div = document.createElement('div');
     div.innerHTML = magnifierTemplate;
     magnifier = div.querySelector('.magnifier');
     document.body.appendChild(magnifier);
@@ -332,34 +329,46 @@ function HTMLMagnifier(options) {
     makeDraggable(magnifier, { ondrag: syncViewport });
   }
 
-  _this.setZoom = function(zoom) {
-    zoom = zoom;
+  _this.setZoom = function(value) {
+    _this.options.zoom = value;
     setupMagnifier();
   };
 
-  _this.setShape = function(shape, size) {
-    shape = shape;
-    if (size) {
-      size = size;
+  _this.setShape = function(shape, width, height) {
+    _this.options.shape = shape;
+    if (width) {
+      _this.options.width = width;
+    }
+    if (height) {
+      _this.options.height = height;
     }
     setupMagnifier();
   };
 
-  _this.setSize = function(size) {
-    size = size;
+  _this.setWidth = function(value) {
+    _this.options.width = value;
+    setupMagnifier();
+  };
+
+  _this.setHeight = function(value) {
+    _this.options.height = value;
     setupMagnifier();
   };
 
   _this.getZoom = function() {
-    return zoom;
+    return _this.options.zoom;
   };
 
   _this.getShape = function() {
-    return shape;
+    return _this.options.shape;
   };
 
-  _this.getSize = function() {
-    return size;
+  _this.getWidth = function() {
+    return _this.options.width;
+  };
+
+  _this.getHeight = function() {
+    return _this.options.height;
   };
 
   _this.isVisible = function() {
@@ -387,7 +396,7 @@ function HTMLMagnifier(options) {
   };
 
   _this.show = function(event) {
-    var left, top;
+    let left, top;
     if (event) {
       left = event.pageX - 20;
       top = event.pageY - 20;

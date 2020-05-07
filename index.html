@@ -99,7 +99,8 @@ The claim eventually became one of the most notable unsolved problems of mathema
 
   <script src="html-magnifier.js"></script>
   <script>
-    var magnifier = new HTMLMagnifier();
+    /* global HTMLMagnifier */
+    const magnifier = new HTMLMagnifier({ width: 400 });
     magnifier.show();
   </script>
 </body>

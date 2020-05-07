@@ -40,7 +40,8 @@ There are also some settings which you can pass to constructor
 {
   zoom: 2
   shape: square | circle
-  size: 200
+  width: 200
+  height: 200
 }
 ~~~
 
@@ -49,7 +50,8 @@ Or set aftewards
 ~~~
 magnifier.setZoom(2);
 magnifier.setShape('circle');
-magnifier.setSize(300);
+magnifier.setWidth(300);
+magnifier.setHeight(300);
 ~~~
 
 There are also couple events which you may find usefull
