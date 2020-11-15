@@ -20,7 +20,14 @@
     "type": "git",
     "url": "git+ssh://git@github.com/jagermesh/html-magnifier.git"
   },
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-jshint": "^2.1.0",
+    "jshint": "^2.12.0"
+  },
   "scripts": {
+    "build": "npm install && gulp buil",
+    "update": "npm update && gulp build",
     "test": "echo \"OK\""
   },
   "version": "2.0.1"
