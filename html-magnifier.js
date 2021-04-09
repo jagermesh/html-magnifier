@@ -21,13 +21,13 @@ function HTMLMagnifier(options) {
   let events = {};
 
   function setPosition(element, left, top) {
-    element.style.left = left + 'px';
-    element.style.top = top + 'px';
+    element.style.left = `${left}px`;
+    element.style.top = `${top}px`;
   }
 
   function setDimensions(element, width, height) {
-    element.style.width = width + 'px';
-    element.style.height = height + 'px';
+    element.style.width = `${width}px`;
+    element.style.height = `${height}px`;
   }
 
   function setupMagnifier() {
@@ -44,7 +44,7 @@ function HTMLMagnifier(options) {
       magnifierContent.style.MozTransform =
         magnifierContent.style.OTransform =
           magnifierContent.style.MsTransform =
-            magnifierContent.style.transform = 'scale(' + _this.options.zoom + ')';
+            magnifierContent.style.transform = `scale(${_this.options.zoom})`;
   }
 
   function isDescendant(parent, child) {
@@ -95,12 +95,28 @@ function HTMLMagnifier(options) {
       observerObj = new MutationObserver(function(mutations, observer) {
         for(let i = 0; i < mutations.length; i++) {
           if (!isDescendant(magnifier, mutations[i].target)) {
-            domChanged();
-            break;
+            try {
+              triggerEvent('checkMutation', mutations[i]);
+              domChanged();
+              break;
+            } catch (error) {
+
+            }
           }
         }
       });
-      observerObj.observe(document, {childList:true, subtree:true, attributes:true});
+      observerObj.observe(document, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: [
+          'class',
+          'width',
+          'height',
+          'style'
+        ],
+        attributeOldValue: true
+      });
     } else
     if (document.addEventListener) {
       document.addEventListener('DOMNodeInserted', domChanged, false);
@@ -238,8 +254,8 @@ function HTMLMagnifier(options) {
     }
 
     function setPosition(element, left, top) {
-      element.style.left = left + 'px';
-      element.style.top = top + 'px';
+      element.style.left = `${left}px`;
+      element.style.top = `${top}px`;
     }
 
     let drg_h, drg_w, pos_y, pos_x, ofs_x, ofs_y;
