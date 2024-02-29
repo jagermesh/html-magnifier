@@ -135,8 +135,8 @@
     function syncViewport() {
       const x1 = magnifier.offsetLeft;
       const y1 = magnifier.offsetTop;
-      const x2 = document.body.scrollLeft;
-      const y2 = document.body.scrollTop;
+      const x2 = window.pageXOffset || document.documentElement.scrollLeft;
+      const y2 = window.pageYOffset || document.documentElement.scrollTop;
       const left = -x1 * _this.options.zoom - x2 * _this.options.zoom;
       const top = -y1 * _this.options.zoom - y2 * _this.options.zoom;
       setPosition(magnifierContent, left, top);
@@ -241,7 +241,6 @@
     }
 
     function makeDraggable(ctrl, options) {
-
       const _this = this;
 
       let dragObject = null;
@@ -435,7 +434,7 @@
     };
 
     init();
-
+    
     return _this;
 
   }
