@@ -13,21 +13,21 @@ Or open [`demo.html`](./demo.html) directly in your browser (no build step neede
 ### npm / bundler (ES module)
 
 ~~~
-npm install html-magnifier
+npm install @jagermesh/html-magnifier
 ~~~
 
 ~~~js
-import HTMLMagnifier from 'html-magnifier';
+import HTMLMagnifier from '@jagermesh/html-magnifier';
 
 const magnifier = new HTMLMagnifier();
 ~~~
 
 ### Plain `<script>` tag
 
-Include the pre-built UMD bundle from `dist/` (works with a CDN like unpkg/jsDelivr too):
+Include the pre-built UMD bundle from `dist/`, or from a CDN:
 
 ~~~html
-<script src="dist/html-magnifier.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@jagermesh/html-magnifier/dist/html-magnifier.min.js"></script>
 <script>
   var magnifier = new window.HTMLMagnifier();
 </script>

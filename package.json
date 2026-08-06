@@ -18,7 +18,7 @@
   "module": "src/html-magnifier.js",
   "unpkg": "dist/html-magnifier.min.js",
   "jsdelivr": "dist/html-magnifier.min.js",
-  "name": "html-magnifier",
+  "name": "@jagermesh/html-magnifier",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/jagermesh/html-magnifier.git"
@@ -34,7 +34,17 @@
   "scripts": {
     "build": "npm install && npm audit fix && webpack --config webpack.config.mjs",
     "update": "npm update && npm audit fix && webpack --config webpack.config.mjs",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "npm run lint"
   },
-  "version": "2.0.3"
+  "version": "2.0.3",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ]
 }
