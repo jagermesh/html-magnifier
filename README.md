@@ -1,10 +1,10 @@
-# JavaScript content magnifier.
+# HTML Magnifier
 
 Simple, lightweight pure JavaScript component that adds a magnifying glass functionality to any web page content.
 
 ## Demo
 
-Open [`demo.html`](./demo.html) directly in your browser (no build step needed) for an interactive demo with buttons for every method described below.
+Open `demo.html` from this repo directly in your browser (no build step required) to see it in action.
 
 ## Installation
 
@@ -20,18 +20,18 @@ import HTMLMagnifier from '@jagermesh/html-magnifier';
 const magnifier = new HTMLMagnifier();
 ~~~
 
-### Plain `<script>` tag
+### As a plain `<script>` tag
 
 Include the pre-built UMD bundle from `dist/`, or from a CDN:
 
 ~~~html
 <script src="https://cdn.jsdelivr.net/npm/@jagermesh/html-magnifier/dist/html-magnifier.min.js"></script>
 <script>
-  var magnifier = new window.HTMLMagnifier();
+  const magnifier = new window.HTMLMagnifier();
 </script>
 ~~~
 
-## Usage:
+## Usage
 
 1) Create magnifier instance
 
@@ -111,7 +111,3 @@ magnifier.on('syncScrollBars', (magnifierContent) => {
 magnifier.syncContent();
 magnifier.syncScrollBars();
 ~~~
-
-Have fun. Send PR if you find any glitches or want to make improvements.
-
-:)
