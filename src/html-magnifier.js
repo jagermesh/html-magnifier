@@ -355,7 +355,13 @@ class HTMLMagnifier {
     let dragObject = null;
 
     options = options || {};
-    options.exclude = [ 'INPUT', 'TEXTAREA', 'SELECT', 'A', 'BUTTON' ];
+    options.exclude = [
+      'INPUT',
+      'TEXTAREA',
+      'SELECT',
+      'A',
+      'BUTTON'
+    ];
 
     const dragHandler = options.handler ? ctrl.querySelector(options.handler) : ctrl;
 
