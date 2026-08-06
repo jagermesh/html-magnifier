@@ -4,9 +4,7 @@ Simple, lightweight pure JavaScript component that adds a magnifying glass funct
 
 ## Demo
 
-https://jagermesh.github.io/html-magnifier/
-
-Or open [`demo.html`](./demo.html) directly in your browser (no build step needed) for an interactive demo with buttons for every method described below.
+Open [`demo.html`](./demo.html) directly in your browser (no build step needed) for an interactive demo with buttons for every method described below.
 
 ## Installation
 
