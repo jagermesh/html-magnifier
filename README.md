@@ -6,29 +6,50 @@ Simple, lightweight pure JavaScript component that adds a magnifying glass funct
 
 https://jagermesh.github.io/html-magnifier/
 
+Or open [`demo.html`](./demo.html) directly in your browser (no build step needed) for an interactive demo with buttons for every method described below.
+
+## Installation
+
+### npm / bundler (ES module)
+
+~~~
+npm install html-magnifier
+~~~
+
+~~~js
+import HTMLMagnifier from 'html-magnifier';
+
+const magnifier = new HTMLMagnifier();
+~~~
+
+### Plain `<script>` tag
+
+Include the pre-built UMD bundle from `dist/` (works with a CDN like unpkg/jsDelivr too):
+
+~~~html
+<script src="dist/html-magnifier.min.js"></script>
+<script>
+  var magnifier = new window.HTMLMagnifier();
+</script>
+~~~
+
 ## Usage:
 
-1) Include the script:
+1) Create magnifier instance
 
-~~~
-<script type="text/javascript" src="html-magnifier.js"></script>
-~~~
-
-2) Create magnifier instance
-
-~~~
-var magnifier = new HTMLMagnifier();
+~~~js
+const magnifier = new HTMLMagnifier();
 ~~~
 
-3) Show when needed
+2) Show when needed
 
-~~~
+~~~js
 magnifier.show();
 ~~~
 
-4) Hide when not needed
+3) Hide when not needed
 
-~~~
+~~~js
 magnifier.hide();
 ~~~
 
@@ -36,42 +57,62 @@ That's all.
 
 There are also some settings which you can pass to constructor
 
-~~~
+~~~js
 {
-  zoom: 2
-  shape: square | circle
-  width: 200
-  height: 200
+  zoom: 2,
+  shape: 'square', // 'square' | 'circle'
+  width: 200,
+  height: 200,
 }
 ~~~
 
-Or set aftewards
+Or set afterwards
 
-~~~
+~~~js
 magnifier.setZoom(2);
 magnifier.setShape('circle');
 magnifier.setWidth(300);
 magnifier.setHeight(300);
 ~~~
 
-There are also couple events which you may find usefull
+You can also read the current settings and visibility state back:
 
-1) You may want to remove some elements from magnfication:
-
+~~~js
+magnifier.getZoom();
+magnifier.getShape();
+magnifier.getWidth();
+magnifier.getHeight();
+magnifier.isVisible();
 ~~~
-magnifier.on('prepareContent', function(magnifierContent) {
-    $('.some-selector', magnifierContent).remove();
+
+There are also a couple of events which you may find useful. Handlers receive a plain DOM node (no jQuery required):
+
+1) You may want to remove some elements from magnification:
+
+~~~js
+magnifier.on('prepareContent', (magnifierContent) => {
+  magnifierContent.querySelectorAll('.some-selector').forEach((el) => el.remove());
 });
 ~~~
 
-2) In some cases you may want to sync scroll positions for scollable areas:
+2) In some cases you may want to sync scroll positions for scrollable areas:
 
-~~~
-magnifier.on('syncScrollBars', function(magnifierContent) {
-  $('div.scrollable-area', magnifierContent).scrollTop($('div.scrollable-area').scrollTop());
+~~~js
+magnifier.on('syncScrollBars', (magnifierContent) => {
+  const source = document.querySelector('div.scrollable-area');
+  const target = magnifierContent.querySelector('div.scrollable-area');
+  if (source && target) {
+    target.scrollTop = source.scrollTop;
+  }
 });
 ~~~
 
+3) You can also force a re-sync of the magnified content or scroll positions at any time:
+
+~~~js
+magnifier.syncContent();
+magnifier.syncScrollBars();
+~~~
 
 Have fun. Send PR if you find any glitches or want to make improvements.
 

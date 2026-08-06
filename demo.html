@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>html-magnifier demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      margin: 20px;
+      background-color: #fafafa;
+    }
+    h1 {
+      font-size: 22px;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+    .toolbar label {
+      font-size: 13px;
+      margin-right: 4px;
+    }
+    button, select, input {
+      font-size: 13px;
+      padding: 4px 8px;
+    }
+    .columns {
+      display: flex;
+      gap: 20px;
+    }
+    .columns .col {
+      flex: 1;
+    }
+    .scrollable {
+      height: 180px;
+      overflow: auto;
+      border: 1px solid #cc0000;
+      padding: 8px;
+      background: #fff;
+      margin-bottom: 16px;
+    }
+    .hidden-from-magnifier {
+      background: #ffe9e9;
+      padding: 8px;
+      border: 1px dashed #cc0000;
+    }
+    img.demo-image {
+      max-width: 100%;
+      border: 1px solid #ddd;
+    }
+    #status {
+      font-family: monospace;
+      font-size: 12px;
+      color: #333;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>html-magnifier demo</h1>
+  <p>Move the mouse over the page after clicking "Show", drag the magnifier glass around, or use the controls below. This page loads the unminified <code>dist/html-magnifier.js</code> bundle directly with a plain <code>&lt;script&gt;</code> tag (no build step required to open this file).</p>
+
+  <div class="toolbar">
+    <button id="btnShow">show()</button>
+    <button id="btnHide">hide()</button>
+
+    <label for="zoom">setZoom</label>
+    <select id="zoom">
+      <option value="1.5">1.5x</option>
+      <option value="2" selected>2x</option>
+      <option value="3">3x</option>
+      <option value="4">4x</option>
+    </select>
+
+    <label for="shape">setShape</label>
+    <select id="shape">
+      <option value="square" selected>square</option>
+      <option value="circle">circle</option>
+    </select>
+
+    <label for="width">setWidth</label>
+    <input id="width" type="number" value="200" step="20" style="width:70px;">
+
+    <label for="height">setHeight</label>
+    <input id="height" type="number" value="200" step="20" style="width:70px;">
+
+    <button id="btnHideMarked">toggle "hide marked block" via prepareContent</button>
+  </div>
+
+  <div id="status"></div>
+
+  <div class="columns">
+    <div class="col">
+      <h2>Scrollable content #1</h2>
+      <div class="scrollable" id="scrollable1">
+        <p>The Pythagorean equation, x2 + y2 = z2, has an infinite number of positive integer solutions for x, y, and z; these solutions are known as Pythagorean triples. Around 1637, Fermat wrote in the margin of a book that the more general equation an + bn = cn had no solutions in positive integers, if n is an integer greater than 2.</p>
+        <p>Attempts to prove it prompted substantial development in number theory, and over time Fermat's Last Theorem gained prominence as an unsolved problem in mathematics. This claim, which came to be known as Fermat's Last Theorem, stood unsolved in mathematics for the following three and a half centuries.</p>
+        <p>The claim eventually became one of the most notable unsolved problems of mathematics, prompting new branches of number theory and abstract algebra to be developed over the years that followed.</p>
+      </div>
+
+      <div class="hidden-from-magnifier" id="markedBlock">
+        This block can be removed from the magnified copy on the fly using the
+        <code>on('prepareContent', ...)</code> event (see the "toggle" button above).
+      </div>
+    </div>
+
+    <div class="col">
+      <h2>Scrollable content #2</h2>
+      <div class="scrollable" id="scrollable2">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+      </div>
+
+      <img class="demo-image" src="https://picsum.photos/500/240" alt="demo image">
+    </div>
+  </div>
+
+  <script src="dist/html-magnifier.js"></script>
+  <script>
+    /* global HTMLMagnifier */
+    const status = document.getElementById('status');
+    function log(message) {
+      status.textContent = message;
+    }
+
+    // window.HTMLMagnifier is provided by the UMD build in dist/html-magnifier.js
+    const magnifier = new HTMLMagnifier({
+      zoom: 2,
+      shape: 'square',
+      width: 200,
+      height: 200,
+    });
+
+    let hideMarkedBlock = false;
+
+    magnifier.on('prepareContent', (magnifierContent) => {
+      if (hideMarkedBlock) {
+        const marked = magnifierContent.querySelector('#markedBlock');
+        if (marked) {
+          marked.parentNode.removeChild(marked);
+        }
+      }
+    });
+
+    magnifier.on('syncScrollBars', () => {
+      log('syncScrollBars event fired at ' + new Date().toLocaleTimeString());
+    });
+
+    document.getElementById('btnShow').addEventListener('click', () => {
+      magnifier.show();
+      log('magnifier.show() called, isVisible() = ' + magnifier.isVisible());
+    });
+
+    document.getElementById('btnHide').addEventListener('click', () => {
+      magnifier.hide();
+      log('magnifier.hide() called, isVisible() = ' + magnifier.isVisible());
+    });
+
+    document.getElementById('zoom').addEventListener('change', (e) => {
+      magnifier.setZoom(parseFloat(e.target.value));
+      log('magnifier.setZoom(' + e.target.value + '), getZoom() = ' + magnifier.getZoom());
+    });
+
+    document.getElementById('shape').addEventListener('change', (e) => {
+      magnifier.setShape(e.target.value);
+      log('magnifier.setShape(' + e.target.value + '), getShape() = ' + magnifier.getShape());
+    });
+
+    document.getElementById('width').addEventListener('change', (e) => {
+      magnifier.setWidth(parseInt(e.target.value, 10));
+      log('magnifier.setWidth(' + e.target.value + '), getWidth() = ' + magnifier.getWidth());
+    });
+
+    document.getElementById('height').addEventListener('change', (e) => {
+      magnifier.setHeight(parseInt(e.target.value, 10));
+      log('magnifier.setHeight(' + e.target.value + '), getHeight() = ' + magnifier.getHeight());
+    });
+
+    document.getElementById('btnHideMarked').addEventListener('click', () => {
+      hideMarkedBlock = !hideMarkedBlock;
+      magnifier.syncContent();
+      log('hideMarkedBlock is now ' + hideMarkedBlock + ' (magnifier.syncContent() called)');
+    });
+  </script>
+</body>
+</html>

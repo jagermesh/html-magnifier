@@ -14,21 +14,27 @@
     "html magnifier"
   ],
   "license": "MIT",
-  "main": "magnifier.js",
+  "main": "dist/html-magnifier.min.js",
+  "module": "src/html-magnifier.js",
+  "unpkg": "dist/html-magnifier.min.js",
+  "jsdelivr": "dist/html-magnifier.min.js",
   "name": "html-magnifier",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/jagermesh/html-magnifier.git"
   },
   "devDependencies": {
-    "gulp": "^4.0.2",
-    "gulp-eslint": "^6.0.0",
-    "eslint": "^8.7.0"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.0",
+    "globals": "^17.9.0",
+    "terser-webpack-plugin": "^5.3.14",
+    "webpack": "^5.102.1",
+    "webpack-cli": "^6.0.1"
   },
   "scripts": {
-    "build": "npm install && gulp build",
-    "update": "npm update && gulp build",
-    "test": "echo \"OK\""
+    "build": "npm install && npm audit fix && webpack --config webpack.config.mjs",
+    "update": "npm update && npm audit fix && webpack --config webpack.config.mjs",
+    "lint": "eslint src"
   },
   "version": "2.0.3"
 }
