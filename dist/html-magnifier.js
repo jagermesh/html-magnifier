@@ -48,10 +48,12 @@ return /******/ (() => { // webpackBootstrap
 /******/ 	
 /************************************************************************/
 let __webpack_exports__ = {};
+const COMPONENT_CLASS = 'jm-magnifier';
+
 const magnifierTemplate = `
-  <div class="magnifier" style="display: none;position: fixed;overflow: hidden;background-color: white;border: 1px solid #555;border-radius: 4px;z-index:10000;">
-    <div class="magnifier-content" style="top: 0px;left: 0px;margin-left: 0px;margin-top: 0px;overflow: visible;position: absolute;display: block;transform-origin: left top;-moz-transform-origin: left top;-ms-transform-origin: left top;-webkit-transform-origin: left top;-o-transform-origin: left top;user-select: none;-moz-user-select: none;-webkit-user-select: none;padding-top: 0px"></div>
-    <div class="magnifier-glass" style="position: absolute;top: 0px;left: 0px;width: 100%;height: 100%;opacity: 0.0;-ms-filter: alpha(opacity=0);background-color: white;cursor: move;"></div>
+  <div class="${COMPONENT_CLASS}" style="display: none;position: fixed;overflow: hidden;background-color: white;border: 1px solid #555;border-radius: 4px;z-index:10000;">
+    <div class="${COMPONENT_CLASS}-content" style="top: 0px;left: 0px;margin-left: 0px;margin-top: 0px;overflow: visible;position: absolute;display: block;transform-origin: left top;-moz-transform-origin: left top;-ms-transform-origin: left top;-webkit-transform-origin: left top;-o-transform-origin: left top;user-select: none;-moz-user-select: none;-webkit-user-select: none;padding-top: 0px"></div>
+    <div class="${COMPONENT_CLASS}-glass" style="position: absolute;top: 0px;left: 0px;width: 100%;height: 100%;opacity: 0.0;-ms-filter: alpha(opacity=0);background-color: white;cursor: move;"></div>
   </div>
 `;
 
@@ -341,7 +343,7 @@ class HTMLMagnifier {
     this.#removeSelectors(bodyCopy, 'script');
     this.#removeSelectors(bodyCopy, 'audio');
     this.#removeSelectors(bodyCopy, 'video');
-    this.#removeSelectors(bodyCopy, '.magnifier');
+    this.#removeSelectors(bodyCopy, `.${COMPONENT_CLASS}`);
     this.#triggerEvent('prepareContent', bodyCopy);
     this.#magnifierContent.appendChild(bodyCopy);
     const width = document.body.clientWidth;
@@ -405,7 +407,13 @@ class HTMLMagnifier {
     let dragObject = null;
 
     options = options || {};
-    options.exclude = [ 'INPUT', 'TEXTAREA', 'SELECT', 'A', 'BUTTON' ];
+    options.exclude = [
+      'INPUT',
+      'TEXTAREA',
+      'SELECT',
+      'A',
+      'BUTTON'
+    ];
 
     const dragHandler = options.handler ? ctrl.querySelector(options.handler) : ctrl;
 
@@ -485,9 +493,9 @@ class HTMLMagnifier {
 
     const div = document.createElement('div');
     div.innerHTML = magnifierTemplate;
-    this.#magnifier = div.querySelector('.magnifier');
+    this.#magnifier = div.querySelector(`.${COMPONENT_CLASS}`);
     document.body.appendChild(this.#magnifier);
-    this.#magnifierContent = this.#magnifier.querySelector('.magnifier-content');
+    this.#magnifierContent = this.#magnifier.querySelector(`.${COMPONENT_CLASS}-content`);
     if (window.addEventListener) {
       window.addEventListener('resize', () => this.#syncContentImpl(), false);
       window.addEventListener('scroll', (e) => this.#syncScrollBarsImpl(e), true);
